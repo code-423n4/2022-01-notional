@@ -63,16 +63,6 @@ library SafeInt256 {
         return z;
     }
 
-    /// @dev Calculates x * RATE_PRECISION / y while checking overflows
-    function divInRatePrecision(int256 x, int256 y) internal pure returns (int256) {
-        return div(mul(x, Constants.RATE_PRECISION), y);
-    }
-
-    /// @dev Calculates x * y / RATE_PRECISION while checking overflows
-    function mulInRatePrecision(int256 x, int256 y) internal pure returns (int256) {
-        return div(mul(x, y), Constants.RATE_PRECISION);
-    }
-
     function toUint(int256 x) internal pure returns (uint256) {
         require(x >= 0);
         return uint256(x);
