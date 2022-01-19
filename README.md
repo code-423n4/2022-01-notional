@@ -1,4 +1,5 @@
 # Notional contest details
+
 - $71,250 USDC main award pot
 - $3,750 USDC gas optimization award pot
 - Join [C4 Discord](https://discord.gg/code4rena) to register
@@ -10,25 +11,34 @@
 This repo will be made public before the start of the contest. (C4 delete this line when made public)
 
 # Marketing Details
+
 - [Notional Logos](https://github.com/notional-finance/media-kit/tree/master/Logos)
 - Twitter: @NotionalFinance
 - Discord: https://discord.notional.finance
 - Website: https://notional.finance
 
-
 # Audit Scope
 
-
-| Contract        | Lines of Code | Complexity | External Contracts |
-| --------------- | ------------- | ---------- | ------------------ |
-| sNOTE           | 123           |            |                    |
-| TreasuryManager |               |            |                    |
-| TreasuryAction  |               |            |                    |
-| EIP1271Wallet   |               |            |                    |
-| EmptyProxy      |               |            |                    |
-| nProxy          |               |            |                    |
-| BoringOwnable   |               |            |                    |
-
+| Module    | File                | Code | Comments | Total Lines | Complexity / Line |
+| :-------- | :------------------ | ---: | -------: | ----------: | ----------------: |
+| Contracts | ActionGuards.sol    |   13 |        5 |          24 |               7.7 |
+| Contracts | TreasuryAction.sol  |  142 |       45 |         217 |              11.3 |
+| Contracts | TreasuryManager.sol |  122 |        4 |         146 |               3.3 |
+| Contracts | sNOTE.sol           |  234 |       88 |         386 |               4.3 |
+| Global    | Constants.sol       |    8 |        7 |          19 |               0.0 |
+| Global    | LibStorage.sol      |   47 |       17 |          71 |               0.0 |
+| Global    | StorageLayoutV1.sol |   19 |       28 |          54 |               0.0 |
+| Global    | StorageLayoutV2.sol |    8 |        4 |          16 |               0.0 |
+| Global    | Types.sol           |   23 |       23 |          50 |               0.0 |
+| Math      | Bitmap.sol          |   69 |       13 |          91 |              23.2 |
+| Math      | FloatingPoint56.sol |   14 |       14 |          34 |               7.1 |
+| Math      | SafeInt256.sol      |   46 |       15 |          83 |              34.8 |
+| Stubs     | BalanceHandler.sol  |   57 |       12 |          81 |               5.3 |
+| Stubs     | TokenHandler.sol    |   63 |       19 |          95 |              25.4 |
+| Utils     | BoringOwnable.sol   |   33 |       16 |          58 |              18.2 |
+| Utils     | EIP1271Wallet.sol   |   38 |        4 |          46 |              10.5 |
+| Utils     | EmptyProxy.sol      |   11 |        3 |          18 |               9.1 |
+| Utils     | nProxy.sol          |   13 |        2 |          19 |               0.0 |
 
 # Staked NOTE Specification
 
