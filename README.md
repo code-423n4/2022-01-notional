@@ -66,7 +66,7 @@ sNOTE is also used as a backstop during a [collateral shortfall event](#collater
 
 ### Collateral Shortfall Event
 
-In the event of a hack or account insolvencies, the Notional protocol may not have sufficient collateral to pay lenders their principal plus interest. In this event, NOTE governors will declare a collateral shortfall event and withdraw up to 30% of the sNOTE BPT tokens into NOTE and ETH. The NOTE portion will be sold or auctioned in order to generate collateral to repay lenders.
+In the event of a hack or account insolvencies, the Notional protocol may not have sufficient collateral to pay lenders their principal plus interest. In this event, NOTE governors will declare a collateral shortfall event and withdraw up to 50% of the sNOTE BPT tokens into NOTE and ETH. The NOTE portion will be sold or auctioned in order to generate collateral to repay lenders.
 
 ### sNOTE Yield Sources
 
@@ -84,7 +84,7 @@ Because the price oracle will be a lagged weighted average, the sNOTE voting pow
 
 ## Treasury Action
 
-Notional V2 uses a number of contracts deployed behind an upgradeable [Router]() to handle all potential actions. The [Treasury Action]() contract will be deployed behind the Router and manage both reserves and accumulated COMP incentives. All calls to the Treasury Action contract will be authenticated to the contract owner or to the [Treasury Manager]() contract.
+Notional V2 uses a number of contracts deployed behind an upgradeable [Router](https://github.com/notional-finance/contracts-v2/blob/master/contracts/external/Router.sol) to handle all potential actions. The `TreasuryAction.sol` contract will be deployed behind the Router and manage both reserves and accumulated COMP incentives. All calls to the Treasury Action contract will be authenticated to the contract owner or by the `TreasuryManager.sol` contract.
 
 Notional will accumulate reserves in each currency every time lending and borrowing occurs. These reserves can be used as a cushion against a collateral shortfall event. If there is insufficient cash for a lender to withdraw, they will withdraw into the reserve buffer. Due to the nature of how cash balances are pooled, it's not possible to know during a withdraw if it is truly from the "reserve". The purpose of `setReserveCashBalance` is so that governance can reset the balance of the cash reserve if it has been withdrawn from.
 
