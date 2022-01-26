@@ -28,7 +28,7 @@ contract TreasuryAction is StorageLayoutV2, ActionGuards, NotionalTreasury {
     /// @dev Emitted when treasury manager is updated
     event TreasuryManagerChanged(address indexed previousManager, address indexed newManager);
     /// @dev Emitted when reserve buffer value is updated
-    event ReserveBufferUpdated(uint16 currencyId, uint256 bufferPercentage);
+    event ReserveBufferUpdated(uint16 currencyId, uint256 bufferAmount);
 
     /// @dev Throws if called by any account other than the owner.
     modifier onlyOwner() {
@@ -59,26 +59,19 @@ contract TreasuryAction is StorageLayoutV2, ActionGuards, NotionalTreasury {
         treasuryManagerContract = manager;
     }
 
-    /// @notice Sets the reserve buffer. This is the percentage of the total token balance of an asset token
-    /// denominated in 1e8 (where 1e8 equals 100%). The reserve cannot be harvested below this percentage of the
-    /// total token balance on the contract. This portion of the reserve will remain on the contract to act as
-    /// a buffer against potential insolvency.
-    /// @dev A better metric for the reserve buffer would be a percentage of outstanding debts but Notional does
-    /// not currently track that number on chain so we will use the token balance (TVL) as a proxy.
+    /// @notice Sets the reserve buffer. This is the amount of reserve balance to keep denominated in 1e8 
+    /// The reserve cannot be harvested if it's below this amount. This portion of the reserve will remain on 
+    /// the contract to act as a buffer against potential insolvency.
     /// @param currencyId refers to the currency of the reserve
-    /// @param bufferPercentage the percentage of the buffer in 1e8 decimal precision, where 1e8 is 100%
-    function setReserveBuffer(uint16 currencyId, uint256 bufferPercentage)
+    /// @param bufferAmount reserve buffer amount to keep in internal token precision (1e8)
+    function setReserveBuffer(uint16 currencyId, uint256 bufferAmount)
         external
         override
         onlyOwner
     {
         _checkValidCurrency(currencyId);
-        require(
-            bufferPercentage <= uint256(Constants.INTERNAL_TOKEN_PRECISION),
-            "T: amount too large"
-        );
-        reserveBuffer[currencyId] = bufferPercentage;
-        emit ReserveBufferUpdated(currencyId, bufferPercentage);
+        reserveBuffer[currencyId] = bufferAmount;
+        emit ReserveBufferUpdated(currencyId, bufferAmount);
     }
 
     /// @notice This is used in the case of insolvency. It allows the owner to re-align the reserve with its correct balance.
@@ -100,25 +93,26 @@ contract TreasuryAction is StorageLayoutV2, ActionGuards, NotionalTreasury {
     /// @notice Claims COMP incentives earned and transfers to the treasury manager contract.
     /// @param cTokens a list of cTokens to claim incentives for
     /// @return the balance of COMP claimed
-    function claimCOMP(address[] calldata cTokens)
+    function claimCOMPAndTransfer(address[] calldata cTokens)
         external
         override
         onlyManagerContract
         nonReentrant
         returns (uint256)
     {
-        // Check that there is no COMP balance before we claim COMP so that we don't inadvertently transfer
+        // Take a snasphot of the COMP balance before we claim COMP so that we don't inadvertently transfer
         // something we shouldn't.
-        require(COMP.balanceOf(address(this)) == 0);
+        uint256 balanceBefore = COMP.balanceOf(address(this));
         COMPTROLLER.claimComp(address(this), cTokens);
         // NOTE: If Notional ever lists COMP as a collateral asset it will be cCOMP instead and it
         // will never hold COMP balances directly. In this case we can always transfer all the COMP
         // off of the contract.
-        uint256 balance = COMP.balanceOf(address(this));
+        uint256 balanceAfter = COMP.balanceOf(address(this));
+        uint256 amountClaimed = balanceAfter.sub(balanceBefore);
         // NOTE: the onlyManagerContract modifier prevents a transfer to address(0) here
-        COMP.safeTransfer(treasuryManagerContract, balance);
+        COMP.safeTransfer(treasuryManagerContract, amountClaimed);
         // NOTE: TreasuryManager contract will emit a COMPHarvested event
-        return balance;
+        return amountClaimed;
     }
 
     /// @notice redeems and transfers tokens to the treasury manager contract
@@ -169,46 +163,35 @@ contract TreasuryAction is StorageLayoutV2, ActionGuards, NotionalTreasury {
             _checkValidCurrency(currencyId);
 
             // Reserve buffer amount in INTERNAL_TOKEN_PRECISION
-            uint256 bufferInternal = reserveBuffer[currencyId];
+            int256 bufferInternal = SafeInt256.toInt(reserveBuffer[currencyId]);
 
             // Reserve requirement not defined
             if (bufferInternal == 0) continue;
 
             // prettier-ignore
-            (int256 reserve, /* */, /* */, /* */) = BalanceHandler.getBalanceStorage(Constants.RESERVE, currencyId);
+            (int256 reserveInternal, /* */, /* */, /* */) = BalanceHandler.getBalanceStorage(Constants.RESERVE, currencyId);
+
+            // Do not withdraw anything if reserve is below or equal to reserve requirement
+            if (reserveInternal <= bufferInternal) continue;
+
             Token memory asset = TokenHandler.getAssetToken(currencyId);
 
-            uint256 totalReserveInternal = reserve.toUint();
-            int256 totalBalanceExternal = SafeInt256.toInt(
-                IERC20(asset.tokenAddress).balanceOf(address(this))
-            );
-            uint256 totalBalanceInternal = asset.convertToInternal(totalBalanceExternal).toUint();
+            // Actual reserve amount allowed to be redeemed and transferred
+            int256 assetInternalRedeemAmount = reserveInternal.subNoNeg(bufferInternal);
 
-            // Reserve balance and buffer are both defined in INTERNAL_TOKEN_PRECISION, so the precision in the
-            // calculation here is 1e8 * 1e8 / 1e8
-            uint256 requiredReserveInternal = totalBalanceInternal.mul(bufferInternal).div(
-                uint256(Constants.INTERNAL_TOKEN_PRECISION)
+            // Redeems cTokens and transfer underlying to treasury manager contract
+            amountsTransferred[i] = _redeemAndTransfer(
+                currencyId,
+                asset,
+                assetInternalRedeemAmount
             );
 
-            if (totalReserveInternal > requiredReserveInternal) {
-                int256 assetInternalRedeemAmount = SafeInt256.toInt(
-                    totalReserveInternal.sub(requiredReserveInternal)
-                );
-
-                // Redeems cTokens and transfer underlying to treasury manager contract
-                amountsTransferred[i] = _redeemAndTransfer(
-                    currencyId,
-                    asset,
-                    assetInternalRedeemAmount
-                );
-
-                // Updates the reserve balance
-                BalanceHandler.harvestExcessReserveBalance(
-                    currencyId,
-                    reserve,
-                    assetInternalRedeemAmount
-                );
-            }
+            // Updates the reserve balance
+            BalanceHandler.harvestExcessReserveBalance(
+                currencyId,
+                reserveInternal,
+                assetInternalRedeemAmount
+            );
         }
 
         // NOTE: TreasuryManager contract will emit an AssetsHarvested event
