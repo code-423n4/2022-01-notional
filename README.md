@@ -8,15 +8,6 @@
 - Starts January 27, 2022 00:00 UTC
 - Ends February 2, 2022 23:59 UTC
 
-This repo will be made public before the start of the contest. (C4 delete this line when made public)
-
-# Marketing Details
-
-- [Notional Logos](https://github.com/notional-finance/media-kit/tree/master/Logos)
-- Twitter: @NotionalFinance
-- Discord: https://discord.notional.finance
-- Website: https://notional.finance
-
 # Audit Scope
 
 | Module    | File                | Code | Comments | Total Lines | Complexity / Line | Solidity Version |
