@@ -10,26 +10,26 @@
 
 # Audit Scope
 
-| Module    | File                | Code | Comments | Total Lines | Complexity / Line | Solidity Version |
-| :-------- | :------------------ | ---: | -------: | ----------: | ----------------: | ---------------: |
-| Contracts | ActionGuards.sol    |   13 |        5 |          24 |               7.7 |            0.7.6 |
-| Contracts | TreasuryAction.sol  |  142 |       45 |         217 |              11.3 |            0.7.6 |
-| Contracts | TreasuryManager.sol |  122 |        4 |         146 |               3.3 |           0.8.11 |
-| Contracts | sNOTE.sol           |  234 |       88 |         386 |               4.3 |           0.8.11 |
-| Global    | Constants.sol       |    8 |        7 |          19 |               0.0 |            0.7.6 |
-| Global    | LibStorage.sol      |   47 |       17 |          71 |               0.0 |            0.7.6 |
-| Global    | StorageLayoutV1.sol |   19 |       28 |          54 |               0.0 |            0.7.6 |
-| Global    | StorageLayoutV2.sol |    8 |        4 |          16 |               0.0 |            0.7.6 |
-| Global    | Types.sol           |   23 |       23 |          50 |               0.0 |            0.7.6 |
-| Math      | Bitmap.sol          |   69 |       13 |          91 |              23.2 |            0.7.6 |
-| Math      | FloatingPoint56.sol |   14 |       14 |          34 |               7.1 |            0.7.6 |
-| Math      | SafeInt256.sol      |   46 |       15 |          83 |              34.8 |            0.7.6 |
-| Stubs     | BalanceHandler.sol  |   57 |       12 |          81 |               5.3 |            0.7.6 |
-| Stubs     | TokenHandler.sol    |   63 |       19 |          95 |              25.4 |            0.7.6 |
-| Utils     | BoringOwnable.sol   |   33 |       16 |          58 |              18.2 |           0.8.11 |
-| Utils     | EIP1271Wallet.sol   |   38 |        4 |          46 |              10.5 |           0.8.11 |
-| Utils     | EmptyProxy.sol      |   11 |        3 |          18 |               9.1 |           0.8.11 |
-| Utils     | nProxy.sol          |   13 |        2 |          19 |               0.0 |           0.8.11 |
+| Module    | File                | Code | Comments | Total Lines | Complexity / Line |
+| :-------- | :------------------ | ---: | -------: | ----------: | ----------------: |
+| Contracts | ActionGuards.sol    |   13 |        5 |          24 |               7.7 |
+| Contracts | TreasuryAction.sol  |  128 |       42 |         200 |              11.7 |
+| Contracts | TreasuryManager.sol |  171 |       20 |         226 |               2.9 |
+| Contracts | sNOTE.sol           |  234 |       91 |         390 |               4.3 |
+| Global    | Constants.sol       |    8 |        7 |          19 |               0.0 |
+| Global    | LibStorage.sol      |   47 |       17 |          71 |               0.0 |
+| Global    | StorageLayoutV1.sol |   19 |       28 |          54 |               0.0 |
+| Global    | StorageLayoutV2.sol |    8 |        4 |          16 |               0.0 |
+| Global    | Types.sol           |   23 |       23 |          50 |               0.0 |
+| Math      | Bitmap.sol          |   69 |       13 |          91 |              23.2 |
+| Math      | FloatingPoint56.sol |   14 |       14 |          34 |               7.1 |
+| Math      | SafeInt256.sol      |   46 |       15 |          83 |              34.8 |
+| Stubs     | BalanceHandler.sol  |   57 |       12 |          81 |               5.3 |
+| Stubs     | TokenHandler.sol    |   63 |       19 |          95 |              25.4 |
+| Utils     | BoringOwnable.sol   |   33 |       16 |          58 |              18.2 |
+| Utils     | EIP1271Wallet.sol   |  158 |       21 |         216 |               5.7 |
+| Utils     | EmptyProxy.sol      |   11 |        3 |          18 |               9.1 |
+| Utils     | nProxy.sol          |   13 |        2 |          19 |               0.0 |
 
 # Staked NOTE Specification
 
